@@ -1,6 +1,10 @@
 from requests import get
 
 def get_competitions():
+    """
+    Эта функция, которая делает запрос на api и получает данные.
+    :return:
+    """
     url = "https://api.football-data.org/v4/competitions"
     try:
         response = get(url=url)
@@ -10,5 +14,3 @@ def get_competitions():
         return None
     else:
         return response.json()
-
-print(get_competitions())
