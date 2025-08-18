@@ -1,6 +1,7 @@
 import psycopg2
 from typing import Optional, Tuple
-import logging
+
+from loging_etl import logger
 
 
 class PostgresConnection:
@@ -44,9 +45,9 @@ class PostgresConnection:
                 port=self.port
             )
             self.cursor = self.connection.cursor()
-            print("Соединение с PostgreSQL установлено успешно.")
+            logger.info("Соединение с PostgreSQL установлено успешно.")
         except psycopg2.Error as e:
-            print(f"Ошибка подключения: {e}")
+            logger.critical(f"Ошибка подключения: {e}")
 
     def __enter__(self):
         """
@@ -56,7 +57,7 @@ class PostgresConnection:
         try:
             self._connect()
         except Exception as error:
-            logging.error(f"Ошибка подключения: {error}")
+            logger.error(f"Ошибка подключения: {error}")
             raise
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -73,9 +74,10 @@ class PostgresConnection:
                 self.connection.close()
             if self.cursor:
                 self.cursor.close()
-            print("Соединение с PostgreSQL закрыто.")
+
+            logger.info("Соединение с PostgreSQL закрыто.")
         except Exception as error:
-            logging.error(f"Ошибка: {error}")
+            logger.error(f"Ошибка: {error}")
             raise
 
 
@@ -83,40 +85,40 @@ class PostgresConnection:
         """Сохранение изменений в базе данных."""
         try:
             self.connection.commit()
-            print("Изменения сохранены.")
+
+            logger.debug("Изменения сохранены.")
         except psycopg2.Error as e:
-            print(f"Ошибка сохранения изменений: {e}")
+            logger.error(f"Ошибка сохранения изменений: {e}")
 
     def __str__(self) -> str:
         """Строковое представление объекта."""
         return (f"Подключено к базе данных '{self.database}'"
                 f" от пользователя '{self.user}'")
 
-    def execute_procedure(
-            self, query: str,
-            params:  Optional[Tuple] = None) -> bool:
+    def execute_procedure(self, query: str, params: Optional[Tuple] = None) -> bool:
+        if self.cursor is None or self.connection is None:
+            logger.critical("Нет подключения к БД. Невозможно выполнить запрос.")
+            return False
+
         try:
             self.cursor.execute(query, params or ())
             return True
         except psycopg2.Error as e:
-            print(f"Ошибка сохранения изменений: {e}")
+            logger.error(f"Ошибка выполнения запроса: {e}")
             return False
+
 
     def execute_function(self, query: str, params:  Optional[Tuple] = None):
         try:
             self.cursor.execute(query, params or ())
             return self.cursor.fetchall()
         except psycopg2.Error as e:
-            print(f"Ошибка сохранения изменений: {e}")
+            logger.error(f"Ошибка сохранения изменений: {e}")
             return None
-
-    def __getattr__(self, name):
-        print(f"Атрибут '{name}' не найден.")
-        return None
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)
 
     def __delattr__(self, name):
-        print(f"Удаление {name} запрещено!")
+        logger.error(f"Удаление {name} запрещено!")
         raise AttributeError("Нельзя удалять!")

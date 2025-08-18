@@ -1,10 +1,11 @@
-# load.py
 from connect import DB
-import pandas as pd
+
+from loging_etl import logger
+
 
 def load_football_data(data_frame) -> bool:
     if data_frame is None or data_frame.empty:
-        print("❌ Нет данных для загрузки")
+        logger.error("Нет данных для загрузки")
         return False
 
     # Создание таблицы
@@ -21,33 +22,34 @@ def load_football_data(data_frame) -> bool:
     );
     """
 
+    # SQL-запрос на вставку
+    insert_query = """
+            INSERT INTO competitions(
+                id, area_id, name, emblem, plan,
+                currentSeason, numberOfAvailableSeasons, last_updated
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
     try:
         # Создаём таблицу
         if not DB.execute_procedure(create_table_query):
-            print("❌ Не удалось создать таблицу")
+            logger.error("Не удалось создать таблицу")
             return False
 
+        logger.info("Мы создали таблицу для вставки")
+
         # Подготовка данных
-        records = [tuple(row) for row in data_frame.where(pd.notna(data_frame), None).values]
+        records = [tuple(row) for row in data_frame.values]
 
-        # SQL-запрос на вставку
-        insert_query = """
-        INSERT INTO competitions(
-            id, area_id, name, emblem, plan,
-            currentSeason, numberOfAvailableSeasons, last_updated
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (id) DO UPDATE SET
-            name = EXCLUDED.name,
-            last_updated = EXCLUDED.last_updated;
-        """
-
-        # ✅ Ключевое исправление: используем executemany напрямую
         DB.cursor.executemany(insert_query, records)
-        DB.connection.commit()  # ✅ Не забываем commit
-        print(f"✅ Успешно загружено {len(records)} записей")
+        DB.connection.commit()
+
+        logger.debug("Мы успешно сохранили данные в бд")
+        logger.debug("Успешно загружено {len(records)} записей")
+
+        logger.info("Мы успешно загрузили данные в Postgres")
+
         return True
 
     except Exception as error:
-        print(f"❌ Ошибка при вставке: {error}")
-        DB.connection.rollback()  # ✅ Откат при ошибке
+        logger.error(f"Ошибка при вставке: {error}")
         return False

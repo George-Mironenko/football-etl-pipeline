@@ -1,4 +1,6 @@
 from requests import get
+from loging_etl import logger
+
 
 def get_competitions():
     """
@@ -9,8 +11,10 @@ def get_competitions():
     try:
         response = get(url=url)
         response.raise_for_status()
+
     except Exception as error:
-        print(error)
+        logger.error(error)
         return None
     else:
+        logger.info("Успешное извлеченные данных из API")
         return response.json()

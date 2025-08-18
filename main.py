@@ -1,6 +1,7 @@
 import extract
 import transform
 import load
+from loging_etl import logger
 
 
 if __name__ == '__main__':
@@ -8,6 +9,7 @@ if __name__ == '__main__':
         if load.load_football_data(
             transform.transform_football_data(
                 extract.get_competitions())):
-            print("Все норм")
+            logger.info("Успешный запуск ETL")
+
     except Exception as error:
-        print("ОЙ ", error)
+        logger.critical(error)
