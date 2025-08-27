@@ -1,4 +1,4 @@
-from connect import DB
+from Basa_data.connect import DB
 
 from loging_etl import logger
 
