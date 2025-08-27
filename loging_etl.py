@@ -39,7 +39,7 @@ logger.setLevel(logging.INFO)
 
 console_handler.setFormatter(ColoredFormatter())
 file_handler.setFormatter(ColoredFormatter())
-
+    
 console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 
