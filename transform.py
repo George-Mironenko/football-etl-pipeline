@@ -52,8 +52,10 @@ def transform_football_data(data_json: dict):
         logger.debug("Преобразованы Nan в None")
 
         logger.info("Успешное преобразование данных.")
-        return df
+
+        df.to_csv('data.csv', index=False)
+
+        logger.info("Успешное сохранение данных в формате csv")
 
     except Exception as error:
         logger.error(error)
-        return None
