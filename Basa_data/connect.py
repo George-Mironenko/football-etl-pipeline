@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-from data_class import PostgresConnection
+from .data_class import PostgresConnection
 from loging_etl import logger
 
 
