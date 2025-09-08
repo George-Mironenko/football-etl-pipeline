@@ -1,4 +1,6 @@
 import pandas as pd
+from flask_admin.form import namegen_filename
+
 from loging_etl import logger
 
 
@@ -52,8 +54,11 @@ def transform_football_data(data_json: dict):
         logger.debug("Преобразованы Nan в None")
 
         logger.info("Успешное преобразование данных.")
-        return df
+
+        name_file = 'database_file/myfile.parquet'
+        df.to_parquet(name_file)
+
+        logger.info(f"Мы успешно сохранили в файл {name_file}")
 
     except Exception as error:
         logger.error(error)
-        return None
