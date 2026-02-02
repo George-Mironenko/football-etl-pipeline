@@ -52,6 +52,7 @@ def transform_football_data(data_json: dict):
         logger.debug("Преобразованы Nan в None")
 
         logger.info("Успешное преобразование данных.")
+
         return df
 
     except Exception as error:

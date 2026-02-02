@@ -1,29 +1,14 @@
 version: '3.8'
 
 services:
-  etl:
+  football-etl:
     build: .
-    env_file:
-      - .env
+    container_name: football_etl
+
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data  # Вот это связывает папки!
       - ./logs:/app/logs
-    depends_on:
-      - postgres
-    restart: on-failure
 
-  postgres:
-    image: postgres:17
-    env_file:
-      - .env
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5438:5432"
-
-volumes:
-  postgres_data:
+      - OUTPUT_PATH=/app/data/competitions.csv
+    restart: "no"

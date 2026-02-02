@@ -32,7 +32,7 @@ formatter = logging.Formatter(
 )
 
 console_handler = logging.StreamHandler() # В консоль
-file_handler = logging.FileHandler("etl.log") # В Файл
+file_handler = logging.FileHandler("logs/etl.log") # В Файл
 
 logger = logging.getLogger(__name__) 
 logger.setLevel(logging.INFO)
