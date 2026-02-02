@@ -1,6 +1,4 @@
 import pandas as pd
-from flask_admin.form import namegen_filename
-
 from loging_etl import logger
 
 
