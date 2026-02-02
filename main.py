@@ -36,6 +36,10 @@ if __name__ == '__main__':
         output_path = os.getenv('OUTPUT_PATH', '/app/data/competitions.csv')
         if save_to_csv(df, output_path):
             logger.info("ETL процесс успешно завершен!")
+            exit(0)
+        else:
+            logger.error("Ошибка при сохранении данных")
+            exit(1)
 
     except Exception as error:
         logger.critical(error)
